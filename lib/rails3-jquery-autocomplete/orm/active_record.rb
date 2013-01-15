@@ -17,14 +17,28 @@ module Rails3JQueryAutocomplete
         limit   = get_autocomplete_limit(options)
         order   = get_autocomplete_order(method, options, model)
 
-
+        
+        terms = term.split('\\s+')
+        #method == columns
+        #term == search term
+        
         items = model.scoped
 
         scopes.each { |scope| items = items.send(scope) } unless scopes.empty?
 
         items = items.select(get_autocomplete_select_clause(model, method, options)) unless options[:full_model]
-        items = items.where(get_autocomplete_where_clause(model, term, method, options)).
-            limit(limit).order(order)
+            
+        terms.each do |term|
+          temp_items = items.where(get_autocomplete_where_clause(model, term, method, options)).
+              limit(limit).order(order)          
+          items = items.empty? ? temp_items : items & temp_items
+        end
+
+        #old way
+        # items = items.where(get_autocomplete_where_clause(model, term, method, options)).
+        #     limit(limit).order(order)
+
+
       end
 
       def get_autocomplete_select_clause(model, method, options)
