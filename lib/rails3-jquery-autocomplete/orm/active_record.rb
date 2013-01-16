@@ -30,7 +30,9 @@ module Rails3JQueryAutocomplete
             
         terms.each do |term|
           temp_items = items.where(get_autocomplete_where_clause(model, term, method, options)).
-              limit(limit).order(order)          
+              limit(limit).order(order)    
+
+          puts temp_items
           items = items.empty? ? temp_items : items & temp_items
         end
 
